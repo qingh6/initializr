@@ -187,6 +187,17 @@ public class ProjectGenerator {
 	public File generateProjectStructure(ProjectRequest request) {
 		try {
 			Map<String, Object> model = resolveModel(request);
+
+			/**
+			 * 打印model的元素--------start---------
+			 */
+			for(Map.Entry<String,Object> map : model.entrySet()){
+				System.out.println(map.getKey()+" = "+map.getValue());
+			}
+//			System.out.println("输出Style: "+model.get("style").toString());
+			/**
+			 * 打印model的元素--------end-------------
+			 */
 			File rootDir = generateProjectStructure(request, model);
 			publishProjectGeneratedEvent(request);
 			return rootDir;
@@ -254,14 +265,180 @@ public class ProjectGenerator {
 
 		File resources = new File(dir, "src/main/resources");
 		resources.mkdirs();
-		writeText(new File(resources, "application.properties"), "");
-
+//		writeText(new File(resources, "application.properties"), "");
+		//相关配置内容写入到application.properties"
+		writeText(new File(resources, "application.properties"),bootString(model));
 		if (request.hasWebFacet()) {
 			new File(dir, "src/main/resources/templates").mkdirs();
 			new File(dir, "src/main/resources/static").mkdirs();
 		}
 		return rootDir;
 	}
+
+//---------------------------bootString start--------------------------------//
+	/**
+	 * 得到model中的style,按style类型，配置需求写入配置文件
+	 *@author lqh
+	 * @param model
+	 * @return
+	 */
+	public String bootString(Map<String, Object> model){
+
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append("system.id=XXX");
+		System.out.println("输出Style: "+model.get("style").toString());
+		//去掉model字符串中的空格以及第一个字符"["和最后一个字符"]"
+		String stringModel = model.get("style").toString().trim().substring(1,model.get("style").toString().length()-1);
+		String[] modelList = stringModel.split("\\,");
+		for(int i=0;i<modelList.length;i++){
+			if("Util".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################Util相关配置################");
+				stringBuffer.append("\t\n");
+			}
+			if("dubboUX".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n#############dubboUX相关配置##############");
+				stringBuffer.append("\t\ndubbo.registry.address=zookeeper://11.113.0.16:2181?backup=11.113.0.21:2181,11.113.0.27:2181");
+				stringBuffer.append("\t\ndubbo.protocol.port=20880");
+			}
+			if("security".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################security相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("aop".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################aop相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("cache".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################cache相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("devtools".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################devtools相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("session".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################session相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("web".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################web相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("websocket".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################websocket相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("web-services".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################web-services相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("jersey".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################jersey相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("groovy-templates".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################groovy-templates相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("thymeleaf".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################thymeleaf相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("mustache".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################mustache相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("data-jpa".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################data-jpa相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("mybatis".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################mybatis相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("jdbc".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################jdbc相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("oracle".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################oracle相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("data-mongodb".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################data-mongodb相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("data-mongodb-reactive".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################data-mongodb-reactive相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("flapdoodle-mongo".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################flapdoodle-mongo相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("data-redis".equals(modelList[i].trim())){
+				stringBuffer.append("\r\n################redis相关配置###############");
+				stringBuffer.append("\r\nspring.redis.pool.max-idle=10");
+				stringBuffer.append("\r\nspring.redis.pool.min-idle=0");
+				stringBuffer.append("\r\nspring.redis.pool.max-active=35");
+				stringBuffer.append("\r\nspring.redis.pool.max-wait=1000");
+				stringBuffer.append("\r\nspring.redis.sentinel.master=");
+				stringBuffer.append("\r\nspring.redis.sentinel.nodes=");
+				stringBuffer.append("\r\nspring.redis.pool.max-idle=10");
+				stringBuffer.append("\r\nspring.redis.pool.min-idle=0");
+			}
+			if("batch".equals(modelList[i].trim())){
+				stringBuffer.append("\r\n################batch相关配置###############");
+				stringBuffer.append("\r\n");
+			}
+			if("integration".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################integration相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("activiti-basic".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################activiti-basic相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("camel".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################camel相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("activemq".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################activemq相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("kafka".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################kafka相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("mail".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################mail相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+			if("data-ldap".equals(modelList[i].trim())){
+				stringBuffer.append("\t\n################data-ldap相关配置###############");
+				stringBuffer.append("\t\n");
+			}
+
+			if("actuator".equals(modelList[i].trim())){
+				stringBuffer.append("\r\n#################aouth相关配置##############");
+				stringBuffer.append("\r\n");
+				stringBuffer.append("\r\n");
+			}
+		}
+		return  stringBuffer.toString();
+	}
+	//-------------------------------------bootString end------------------------------------------//
 
 	/**
 	 * Create a distribution file for the specified project structure directory and
