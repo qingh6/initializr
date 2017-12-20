@@ -1191,6 +1191,13 @@ initializr:
           links:
             - rel: reference
               href: http://docs.spring.io/spring-boot/docs/{bootVersion}/reference/htmlsingle/#boot-features-kafka
+        - name: Jackson
+          id: Jackson
+          weight: 100
+          description: Add Jackson if the Kafka is selected
+          groupId: com.fasterxml.jackson.core
+          artifactId: jackson-databind
+          starter: false
         - name: Mail
           id: mail
           description: javax.mail

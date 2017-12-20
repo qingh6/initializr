@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -255,6 +257,11 @@ public class MainController extends AbstractInitializrController {
 	@ResponseBody
 	public ResponseEntity<byte[]> springZip(BasicProjectRequest basicRequest)
 			throws IOException {
+		//选中kafka时，添加Jackson依赖---------start---------
+		if(!basicRequest.getStyle().contains("Jackson") && basicRequest.getStyle().contains("kafka")){
+			basicRequest.getStyle().add("Jackson");
+		}
+		//选中kafka时，添加Jackson依赖---------end---------
 		ProjectRequest request = (ProjectRequest) basicRequest;
 		File dir = projectGenerator.generateProjectStructure(request);
 

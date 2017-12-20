@@ -113,6 +113,7 @@ public class InitializrAutoConfiguration {
 			RestTemplateBuilder restTemplateBuilder) {
 		InitializrMetadata metadata = InitializrMetadataBuilder
 				.fromInitializrProperties(properties).build();
+//		System.out.println("输出InitializrAutoConfiguration-----------");
 		return new DefaultInitializrMetadataProvider(metadata,
 				restTemplateBuilder.build());
 	}
