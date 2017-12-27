@@ -243,14 +243,31 @@ public class ProjectGenerator {
 		String applicationName = request.getApplicationName();
 		String language = request.getLanguage();
 
+		String kafkaName1 = request.getName()+"ServiceStatusCode";//获取kafka的服务状态码
+//		String kafkaName = request.getKafkaName();//获取kafka的服务状态码
 		String codeLocation = language;
 		File src = new File(new File(dir, "src/main/" + codeLocation),
 				request.getPackageName().replace(".", "/"));
 		src.mkdirs();
 		String extension = ("kotlin".equals(language) ? "kt" : language);
+//		write(new File(src, applicationName + "." + extension),
+//				"Application." + extension, model);
 		write(new File(src, applicationName + "." + extension),
 				"Application." + extension, model);
-
+		/**
+		 * 添加kafka的KafkaDemoServiceStatusCode--------start-----
+		 */
+//		String stringModel = model.get("style").toString().trim().substring(1,model.get("style").toString().length()-1);
+//		String[] modelList = stringModel.split("\\,");
+//		for(int i=0;i<modelList.length;i++) {
+//			if("Util".equals(modelList[i].trim())){
+				write(new File(src, kafkaName1 + "." + extension),
+						"KafkaDemoServiceStatusCode." + extension, model);
+//			}
+//		}
+		/**
+		 * 添加kafka的KafkaDemoServiceStatusCode--------end-----
+		 */
 		if ("war".equals(request.getPackaging())) {
 			String fileName = "ServletInitializer." + extension;
 			write(new File(src, fileName), fileName, model);

@@ -47,6 +47,9 @@ public class ProjectRequest extends BasicProjectRequest {
 	 */
 	public static final String DEFAULT_STARTER = "root_starter";
 
+	private String kafkaName;//添加kafka服务状态码
+
+	private String qhName;
 	private final Map<String, Object> parameters = new LinkedHashMap<>();
 
 	// Resolved dependencies based on the ids provided by either "style" or "dependencies"
@@ -191,6 +194,17 @@ public class ProjectRequest extends BasicProjectRequest {
 			setApplicationName(
 					metadata.getConfiguration().generateApplicationName(getName()));
 		}
+		//添加qhName
+		if (!StringUtils.hasText(getQhName())) {
+			setQhName(
+					metadata.getConfiguration().generateQhName(getName()));
+		}
+
+		//添加kafka 服务状态码
+		if (!StringUtils.hasText(getKafkaName())) {
+			setKafkaName(
+					metadata.getConfiguration().generateKafkaName(getName()));
+		}
 		setPackageName(metadata.getConfiguration().cleanPackageName(getPackageName(),
 				metadata.getPackageName().getContent()));
 
@@ -313,4 +327,19 @@ public class ProjectRequest extends BasicProjectRequest {
 				+ (build != null ? "build=" + build : "") + "]";
 	}
 
+	public String getKafkaName() {
+		return kafkaName;
+	}
+
+	public void setKafkaName(String kafkaName) {
+		this.kafkaName = kafkaName;
+	}
+
+	public String getQhName() {
+		return qhName;
+	}
+
+	public void setQhName(String qhName) {
+		this.qhName = qhName;
+	}
 }

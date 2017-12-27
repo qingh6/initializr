@@ -44,6 +44,7 @@ public class BasicProjectRequest {
 	private String packageName;
 	private String javaVersion;
 
+//	private String kafkaName;//添加kafka服务状态码，放在ProjectRequest中了
 	// The base directory to create in the archive - no baseDir by default
 	private String baseDir;
 
@@ -173,4 +174,11 @@ public class BasicProjectRequest {
 		this.baseDir = baseDir;
 	}
 
+//	public String getKafkaName() {
+//		return kafkaName;
+//	}
+//
+//	public void setKafkaName(String kafkaName) {
+//		this.kafkaName = kafkaName;
+//	}
 }
