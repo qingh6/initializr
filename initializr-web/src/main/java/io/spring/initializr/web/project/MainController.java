@@ -23,9 +23,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.samskivert.mustache.Mustache;
 import io.spring.initializr.generator.BasicProjectRequest;
@@ -60,6 +62,7 @@ import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -262,6 +265,12 @@ public class MainController extends AbstractInitializrController {
 			basicRequest.getStyle().add("Jackson");
 		}
 		//选中kafka时，添加Jackson依赖---------end---------
+//		basicRequest.setName("Zhangsan");
+		String name = splitCamelCase(basicRequest.getName());
+		String result = unsplitWords(name);
+		String candidate = StringUtils.capitalize(result);
+		basicRequest.setName(candidate);
+
 		ProjectRequest request = (ProjectRequest) basicRequest;
 		File dir = projectGenerator.generateProjectStructure(request);
 
@@ -361,6 +370,23 @@ public class MainController extends AbstractInitializrController {
 				builder);
 		return builder.toString();
 	}
+
+	private static String splitCamelCase(String text) {
+		return String
+				.join("", Arrays.stream(text
+						.split("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])"))
+						.map(it -> StringUtils.capitalize(it.toLowerCase()))
+						.collect(Collectors.toList())
+						.toArray(new String[0]));
+	}
+
+	private static String unsplitWords(String text) {
+		return String
+				.join("", Arrays.stream(text
+						.split("(_|-| |:)+")).map(StringUtils::capitalize)
+						.collect(Collectors.toList()).toArray(new String[0]));
+	}
+
 
 }
 

@@ -39,6 +39,11 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Stephane Nicoll
+ * @author lqh
+ * 额外的功能：
+ * 1）选中kafka时，添加kafka服务状态码
+ * 若不想再此处添加{kafkaName}，可以在MainController的springZip()方法中,直接修改
+ * BasicProjectRequest中的name,在模板中用{{name}}代替kafkaName即可
  */
 public class ProjectRequest extends BasicProjectRequest {
 
@@ -194,12 +199,14 @@ public class ProjectRequest extends BasicProjectRequest {
 			setApplicationName(
 					metadata.getConfiguration().generateApplicationName(getName()));
 		}
-		//添加qhName
-		if (!StringUtils.hasText(getQhName())) {
-			setQhName(
-					metadata.getConfiguration().generateQhName(getName()));
-		}
 
+//		//修改BasicProjectRequest中的name
+//		if (StringUtils.hasText(getName())) {
+////			setName(
+////					metadata.getConfiguration().generateName(getName()));
+//			setName(
+//					metadata.getConfiguration().generateApplicationName(getName()).substring(0,10));
+//		}
 		//添加kafka 服务状态码
 		if (!StringUtils.hasText(getKafkaName())) {
 			setKafkaName(

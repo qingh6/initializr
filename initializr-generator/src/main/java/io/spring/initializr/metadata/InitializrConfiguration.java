@@ -39,6 +39,8 @@ import org.springframework.util.StringUtils;
  * Various configuration options used by the service.
  *
  * @author Stephane Nicoll
+ * @author lqh
+ * 添加添加kafka 服务状态码
  */
 public class InitializrConfiguration {
 
@@ -97,7 +99,7 @@ public class InitializrConfiguration {
 	 */
 	public String generateKafkaName(String name) {
 		if (!StringUtils.hasText(name)) {
-			return env.fallbackApplicationName;
+			return env.kafkaBackServiceStatusCode;
 		}
 		String text = splitCamelCase(name.trim());
 		// TODO: fix this
@@ -108,36 +110,37 @@ public class InitializrConfiguration {
 		String candidate = StringUtils.capitalize(result);
 		if (hasInvalidChar(candidate)
 				|| env.invalidApplicationNames.contains(candidate)) {
-			return env.fallbackApplicationName;
+			return env.kafkaBackServiceStatusCode;
 		}
 		else {
 			return candidate;
 		}
 	}
-	/**
-	 *添加qhName
-	 * @param name
-	 * @return
-	 */
-	public String generateQhName(String name) {
-		if (!StringUtils.hasText(name)) {
-			return env.fallbackApplicationName;
-		}
-		String text = splitCamelCase(name.trim());
-		// TODO: fix this
-		String result = unsplitWords(text);
-//		if (!result.endsWith("ServiceStatusCode")) {
-//			result = result + "ServiceStatusCode";
+//	/**
+//	 *修改Name
+//	 * @param name
+//	 * @return
+//	 */
+//	public String generateName(String name) {
+//		if (!StringUtils.hasText(name)) {
+//			return env.fallbackApplicationName;
 //		}
-		String candidate = StringUtils.capitalize(result);
-		if (hasInvalidChar(candidate)
-				|| env.invalidApplicationNames.contains(candidate)) {
-			return env.fallbackApplicationName;
-		}
-		else {
-			return candidate;
-		}
-	}
+//		String text = splitCamelCase(name.trim());
+//		// TODO: fix this
+//		String result = unsplitWords(text);
+////		if (!result.endsWith("ServiceStatusCode")) {
+////			result = result + "ServiceStatusCode";
+////		}
+//		String candidate = StringUtils.capitalize(result);
+//		if (hasInvalidChar(candidate)
+//				|| env.invalidApplicationNames.contains(candidate)) {
+//			return env.fallbackApplicationName;
+//		}
+//		else {
+//			return candidate;
+//		}
+//	}
+
 	/**
 	 * Clean the specified package name if necessary. If the package name cannot be
 	 * transformed to a valid package name, the {@code defaultPackageName} is used
@@ -228,12 +231,12 @@ public class InitializrConfiguration {
 		/**
 		 * The application name to use if none could be generated.
 		 */
-		private String fallbackApplicationName = "ApplicationQH";
+		private String fallbackApplicationName = "Application";
 
-//		/**
-//		 * 选中kafka时，创建KafkaDemoBackServiceStatusCode类名
-//		 */
-////		private String kafkaBackServiceStatusCode = "ServiceStatusCode";
+		/**
+		 * 选中kafka时，创建KafkaDemoBackServiceStatusCode类名
+		 */
+		private String kafkaBackServiceStatusCode = "ServiceStatusCode";
 
 		/**
 		 * The list of invalid application names. If such name is chosen or generated, the

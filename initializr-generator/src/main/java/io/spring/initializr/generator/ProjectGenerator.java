@@ -59,6 +59,14 @@ import org.springframework.util.StreamUtils;
  * @author Stephane Nicoll
  * @author Sebastien Deleuze
  * @author Andy Wilkinson
+ * @author lqh
+ ** 额外的功能：
+ *1）：相关的配置内容，写入到application.properties中
+ *2）：kafka选中时,利用模板添加logback-spring.xml
+ *3）：kafka选中时，添加kafka的KafkaDemoServiceStatusCode,
+ * 方法一：修改类ProjectRequest、InitializrConfiguration的配置
+ * 方法二：若不想在类ProjectRequest中添加{kafkaName}，可以在MainController的springZip()方法中,直接修改
+ * BasicProjectRequest中的name,在模板中用{{name}}代替kafkaName即可
  */
 public class ProjectGenerator {
 
@@ -235,6 +243,10 @@ public class ProjectGenerator {
 		else {
 			String pom = new String(doGenerateMavenPom(model));
 			writeText(new File(dir, "pom.xml"), pom);
+			//------start----选中了kafka，需要向resource(dir)中添加logback-spring.xml---
+			String logback = new String(doGenerateLogbackXml(model));
+			writeText(new File(dir, "logback-spring.xml"), logback);
+			//------end----选中了kafka，需要向resource(dir)中添加logback-spring.xml---
 			writeMavenWrapper(dir);
 		}
 
@@ -243,30 +255,21 @@ public class ProjectGenerator {
 		String applicationName = request.getApplicationName();
 		String language = request.getLanguage();
 
-		String kafkaName1 = request.getName()+"ServiceStatusCode";//获取kafka的服务状态码
-//		String kafkaName = request.getKafkaName();//获取kafka的服务状态码
+		String kafkaName = request.getKafkaName();//获取kafka的服务状态码
 		String codeLocation = language;
 		File src = new File(new File(dir, "src/main/" + codeLocation),
 				request.getPackageName().replace(".", "/"));
 		src.mkdirs();
 		String extension = ("kotlin".equals(language) ? "kt" : language);
-//		write(new File(src, applicationName + "." + extension),
-//				"Application." + extension, model);
 		write(new File(src, applicationName + "." + extension),
 				"Application." + extension, model);
 		/**
-		 * 添加kafka的KafkaDemoServiceStatusCode--------start-----
+		 * -----start----添加kafka的KafkaDemoServiceStatusCode--------start-----
 		 */
-//		String stringModel = model.get("style").toString().trim().substring(1,model.get("style").toString().length()-1);
-//		String[] modelList = stringModel.split("\\,");
-//		for(int i=0;i<modelList.length;i++) {
-//			if("Util".equals(modelList[i].trim())){
-				write(new File(src, kafkaName1 + "." + extension),
-						"KafkaDemoServiceStatusCode." + extension, model);
-//			}
-//		}
+		write(new File(src, kafkaName + "." + extension),
+				"KafkaDemoServiceStatusCode." + extension, model);
 		/**
-		 * 添加kafka的KafkaDemoServiceStatusCode--------end-----
+		 * -----end----添加kafka的KafkaDemoServiceStatusCode--------end-----
 		 */
 		if ("war".equals(request.getPackaging())) {
 			String fileName = "ServletInitializer." + extension;
@@ -285,6 +288,24 @@ public class ProjectGenerator {
 //		writeText(new File(resources, "application.properties"), "");
 		//相关配置内容写入到application.properties"
 		writeText(new File(resources, "application.properties"),bootString(model));
+
+		//------start-------选中kafka时，添加logback-spring.xml、KafkaDemoServiceStatusCode---start-------
+
+		String stringModel = model.get("style").toString().trim().substring(1,model.get("style").toString().length()-1);
+		String[] modelList = stringModel.split("\\,");
+		for(int i=0;i<modelList.length;i++) {
+			if ("kafka".equals(modelList[i].trim())) {
+				///方法一，在java代码中写
+//				writeText(new File(resources, "logback-spring.xml"),logbackSpring());
+				//方法二，利用模板，参考pom.xml
+				String logback = new String(doGenerateLogbackXml(model));
+				writeText(new File(resources, "logback-spring.xml"), logback);
+//				//添加kafka的KafkaDemoServiceStatusCode,参考applcationName
+////				write(new File(src, kafkaName + "." + extension),
+////						"KafkaDemoServiceStatusCode." + extension, model);
+			}
+		}
+		//------end-------选中kafka时，添加logback-spring.xml、KafkaDemoServiceStatusCode-----end-------
 		if (request.hasWebFacet()) {
 			new File(dir, "src/main/resources/templates").mkdirs();
 			new File(dir, "src/main/resources/static").mkdirs();
@@ -457,6 +478,24 @@ public class ProjectGenerator {
 	}
 	//-------------------------------------bootString end------------------------------------------//
 
+//	/**
+//	 * 选中kafka时，方法一：向logback-spring.xml中添加相关配置内容----------start------------
+//	 * @return
+//	 */
+//	public String logbackSpring(){
+//		StringBuffer logbackSpringBuff = new StringBuffer();
+//		logbackSpringBuff.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+//		logbackSpringBuff.append("\r\n<configuration scan=\"true\">");
+//		logbackSpringBuff.append("\r\n\t\t<include resource=\"com/kafka/sdk/util/logging/logback-default.xml\"/>");
+//		logbackSpringBuff.append("\r\n\t\t<root level=\"INFO\">");
+//		logbackSpringBuff.append("\r\n\t\t\t\t<appender-ref ref=\"FILE\"/>");
+//		logbackSpringBuff.append("\r\n\t\t\t\t<appender-ref ref=\"CONSOLE\"/>");
+//		logbackSpringBuff.append("\r\n\t\t</root>");
+//		logbackSpringBuff.append("\r\n</configuration>");
+//		return logbackSpringBuff.toString();
+//	}
+//	//选中kafka时，像logback-spring.xml中添加相关配置内容----------end-------------
+
 	/**
 	 * Create a distribution file for the specified project structure directory and
 	 * extension
@@ -614,8 +653,8 @@ public class ProjectGenerator {
 		// Add various versions
 		model.put("dependencyManagementPluginVersion", metadata.getConfiguration()
 				.getEnv().getGradle().getDependencyManagementPluginVersion());
-		model.put("kotlinVersion", metadata.getConfiguration().getEnv().getKotlin()
-				.resolveKotlinVersion(bootVersion));
+//		model.put("kotlinVersion", metadata.getConfiguration().getEnv().getKotlin()
+//				.resolveKotlinVersion(bootVersion));
 		if ("kotlin".equals(request.getLanguage())) {
 			model.put("kotlin", true);
 		}
@@ -794,6 +833,11 @@ public class ProjectGenerator {
 		return templateRenderer.process("starter-pom.xml", model).getBytes();
 	}
 
+	//----start---添加logback-spring.xml--start---
+	private byte[] doGenerateLogbackXml(Map<String, Object> model) {
+		return templateRenderer.process("logback-spring.xml", model).getBytes();
+	}
+	//----end-----添加logback-spring.xml----end-----
 	private byte[] doGenerateGradleBuild(Map<String, Object> model) {
 		return templateRenderer.process("starter-build.gradle", model).getBytes();
 	}
